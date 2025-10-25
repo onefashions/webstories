@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Web Stories - Video + Text Slides</title>
+  <style>
+    :root {
+      --bg: #000;
+      --accent: #fff;
+      --nav-size: 56px;
+      --slide-gap: 12px;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--accent);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial
+    }
+
+    /* container for story (vertical mobile-friendly) */
+    .story-wrap {
+      max-width: 420px;
+      margin: 18px auto;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #111;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .6);
+      position: relative
+    }
+
+    .story {
+      height: 780px;
+      max-height: calc(100vh - 36px);
+      display: flex;
+      flex-direction: column
+    }
+
+    /* slides stack */
+    .slides {
+      flex: 1;
+      position: relative;
+      display: block;
+      overflow: hidden;
+      background: #000
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: 1fr;
+      align-items: end;
+      justify-items: stretch;
+      opacity: 0;
+      transform: translateY(8px) scale(.995);
+      transition: opacity .45s ease, transform .45s cubic-bezier(.2, .9, .2, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0) scale(1)
+    }
+
+    /* video fits */
+    .slide video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    /* text overlay area */
+    .overlay {
+      position: relative;
+      z-index: 3;
+      padding: 22px 6px 36px;
+      pointer-events: none
+    }
+
+    .caption {
+      
+      backdrop-filter: blur(4px);
+      background: linear-gradient(180deg, rgba(0, 0, 0, .0), rgba(0, 0, 0, .45));
+      padding: 6px;
+      border-radius: 12px;
+      color: var(--accent)
+    }
+    table, th, td {
+      border: 1px solid;
+    }
+
+    .caption h1 {
+      font-size: 28px;
+      margin: 0 0 6px;
+      line-height: 1.05
+    }
+
+    .caption p {
+      margin: 0;
+      font-size: 14px;
+      opacity: .95
+    }
+
+    /* entry animations for text blocks */
+    .animate-fadeup {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp .8s forwards;
+      animation-delay: var(--delay, 0s)
+    }
+
+    .animate-slideleft {
+      opacity: 0;
+      transform: translateX(-22px);
+      animation: slideLeft .75s forwards;
+      animation-delay: var(--delay, 0s)
+    }
+
+    .animate-slideright {
+      opacity: 0;
+      transform: translateX(22px);
+      animation: slideRight .75s forwards;
+      animation-delay: var(--delay, 0s)
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes slideLeft {
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    @keyframes slideRight {
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    /* progress bar */
+    .progress-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 4px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .04));
+      z-index: 4
+    }
+
+    .progress-bar>div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #fff8 0%, #fff 60%);
+      transition: width linear
+    }
+
+    /* nav */
+    .nav {
+      height: var(--nav-size);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      gap: 8px
+    }
+
+    .nav .dots {
+      display: flex;
+      gap: 8px
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .2)
+    }
+
+    .dot.active {
+      background: #fff
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .06);
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--accent);
+      cursor: pointer
+    }
+
+    /* touch hint */
+    .hint {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      background: rgba(0, 0, 0, .45);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px
+    }
+
+    /* small screens full height */
+    @media (max-width:520px) {
+      .story-wrap {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        margin: 0;
+        max-width: none
+      }
+
+      .story {
+        height: 100vh
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="story-wrap" id="storyWrap">
+    <div class="progress-bar">
+      <div id="progressFill"></div>
+    </div>
+    <div class="story">
+      <div class="slides" id="slides">
+
+        <!-- Slides replaced: 7 boxes with `145698` only -->
+        <article class="slide active" data-duration="5000">
+          <video playsinline muted autoplay loop preload="auto">
+            <source src="video1.mp4" type="video/mp4">
+          </video>
+          <div class="overlay">
+            <div class="caption">
+              <table class="table table-bordered" style="border-radius: 8px;">
+                <thead>
+                  <tr>
+                    <th scope="col">Starters</th>
+                    <th scope="col">PTS</th>
+                    <th scope="col">REB</th>
+                    <th scope="col">AST</th>
+                    <th scope="col">FG%</th>
+                    <th scope="col">3PT%</th>
+                    <th scope="col">+/-</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>Stephen Curry</th>
+                    <td>29</td>
+                    <td>4</td>
+                    <td>6</td>
+                    <td>52.4</td>
+                    <td>50</td>
+                    <td>+6</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <div class="nav">
+          <div class="dots" id="dots"></div>
+          <div class="controls">
+            <button class="btn" id="prevBtn">Prev</button>
+            <button class="btn" id="playPause">Pause</button>
+            <button class="btn" id="nextBtn">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Simple Web-Stories-like slider with video background + text animations
+      (function () {
+        const slides = Array.from(document.querySelectorAll('.slide'));
+        const progressFill = document.getElementById('progressFill');
+        const dotsWrap = document.getElementById('dots');
+        let current = 0;
+        let playing = true;
+        let timer = null;
+        let startTs = null;
+
+        function makeDots() {
+          slides.forEach((s, i) => {
+            const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); d.dataset.index = i; dotsWrap.appendChild(d);
+            d.addEventListener('click', () => goTo(i));
+          })
+        }
+
+        function setActive(idx) {
+          slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+          Array.from(dotsWrap.children).forEach((d, i) => d.classList.toggle('active', i === idx));
+        }
+
+        function getDuration(idx) {
+          const raw = slides[idx].dataset.duration; return raw ? parseInt(raw, 10) : 5000;
+        }
+
+        function playSlide(idx) {
+          clearTimeout(timer);
+          setActive(idx);
+          current = idx;
+          startTs = performance.now();
+          progressFill.style.transition = 'none';
+          progressFill.style.width = '0%';
+
+          // small timeout to allow transition property to be reset
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              progressFill.style.transition = `width ${getDuration(idx)}ms linear`;
+              progressFill.style.width = '100%';
+            });
+          });
+
+          if (playing) {
+            timer = setTimeout(() => {
+              goTo((idx + 1) % slides.length);
+            }, getDuration(idx));
+          }
+
+          // restart text animations each time
+          slides[idx].querySelectorAll('.animate-fadeup, .animate-slideleft, .animate-slideright').forEach(el => {
+            el.style.animation = 'none';
+            // force reflow
+            void el.offsetWidth;
+            el.style.animation = '';
+          });
+        }
+
+        function goTo(idx) { playSlide(idx); }
+
+        function next() { goTo((current + 1) % slides.length); }
+        function prev() { goTo((current - 1 + slides.length) % slides.length); }
+
+        // controls
+        document.getElementById('nextBtn').addEventListener('click', () => { next(); });
+        document.getElementById('prevBtn').addEventListener('click', () => { prev(); });
+        document.getElementById('playPause').addEventListener('click', function () { playing = !playing; this.textContent = playing ? 'Pause' : 'Play'; if (playing) { playSlide(current); } else { clearTimeout(timer); progressFill.style.transition = 'none'; } });
+
+        // touch / click navigation: tap right/left
+        const wrap = document.getElementById('storyWrap');
+        let touchStartX = 0, touchStartY = 0;
+        wrap.addEventListener('touchstart', (e) => { const t = e.touches[0]; touchStartX = t.clientX; touchStartY = t.clientY; });
+        wrap.addEventListener('touchend', (e) => {
+          const t = (e.changedTouches && e.changedTouches[0]) || {}; const dx = t.clientX - touchStartX; const dy = t.clientY - touchStartY;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { if (dx < 0) next(); else prev(); }
+          else { // tap
+            const w = wrap.clientWidth; const x = t.clientX; if (x > w * 0.66) next(); else if (x < w * 0.33) prev(); else { playing = !playing; document.getElementById('playPause').textContent = playing ? 'Pause' : 'Play'; if (playing) playSlide(current); else clearTimeout(timer); }
+          }
+        });
+
+        // keyboard
+        window.addEventListener('keyup', (e) => { if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); if (e.key === ' ') { playing = !playing; document.getElementById('playPause').textContent = playing ? 'Pause' : 'Play'; if (playing) playSlide(current); else clearTimeout(timer); } });
+
+        // visibility pause
+        document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTimeout(timer); } else { if (playing) playSlide(current); } });
+
+        makeDots(); playSlide(0);
+
+        // optional: prefetch videos so first frame available
+        slides.forEach(s => { const v = s.querySelector('video'); if (v) { v.load(); } });
+      })();
+    </script>
+</body>
+
+</html>
